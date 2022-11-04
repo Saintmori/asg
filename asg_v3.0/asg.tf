@@ -9,9 +9,17 @@ resource "aws_autoscaling_group" "main" {
   launch_configuration      = aws_launch_configuration.main.name
   vpc_zone_identifier       = var.vpc_zone_identifier
   tag {
-    key                 = "env"
-    value               = var.env
+    key   = "Name"
+    value = replace(local.name, "rtype", "asg_v3")
     propagate_at_launch = true
+  }
+  dynamic "tag" {
+    for_each = local.common_tags
+    content {
+      key                 = tag.key
+      value               = tag.value
+      propagate_at_launch = true
+    }
   }
   lifecycle {
     create_before_destroy = true
